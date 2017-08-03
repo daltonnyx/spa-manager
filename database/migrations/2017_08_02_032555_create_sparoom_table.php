@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUsersTable extends Migration
+class CreateSparoomTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,12 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('spa_rooms', function(Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->string('email',100)->unique();
-            $table->string('password');
-            $table->string('role');
-            $table->rememberToken();
-            $table->timestamps();
+            $table->string("title");
+            $table->integer('shop_id')->unsigned();
+            $table->foreign('shop_id')->references('id')->on('spa_shops');
+            $table->string('description');
         });
     }
 
@@ -31,6 +29,6 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::drop('spa_rooms');
     }
 }
