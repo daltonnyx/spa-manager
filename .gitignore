@@ -14,3 +14,6 @@ yarn-error.log
 *.swo
 .sass-cache
 *.map
+public/js
+public/dist
+public/node_modules
