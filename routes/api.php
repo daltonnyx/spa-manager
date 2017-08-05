@@ -38,7 +38,7 @@ Route::group(['middleware' => 'auth:api'], function() {
 });
 
 Route::group(['middleware' => 'auth:api'], function() {
-    Route::get('/bookings/{room_id}', 'SpaBookingController@index');
+    Route::get('/bookings/{room_id}/{date}', 'SpaBookingController@index');
     Route::get('/bookings/{booking}', 'SpaBookingController@show');
     Route::post('/bookings', 'SpaBookingController@store');
     Route::put('/bookings/{booking}', 'SpaBookingController@update');
