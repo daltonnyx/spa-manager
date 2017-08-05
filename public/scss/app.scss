@@ -1,0 +1,57 @@
+.timeGrid {
+    position: relative;
+    td, th {
+        border: 1px solid #ccc;
+        padding: 7px 5px;
+    }
+    td {
+        position: relative;
+        overflow:hidden;
+        cursor: pointer;
+        &:hover:after {
+            opacity: 1;
+        }
+    }
+    td::after {
+        opacity: 0;
+        transition: .3s linear all;
+        -webkit-transition: .3s linear all;
+        content: "+";
+        position: absolute;
+        top: 50%;
+        left:0;
+        width: 100%;
+        text-align: center;
+        transform: translateY(-50%);
+        font-size: 35px;
+    }
+    .room {
+        cursor: pointer;
+    }
+}
+.book {
+    position: absolute;
+    background: pink;
+    background: #E3E3FF;
+    border: 1px solid #A9ABFE;
+    cursor: pointer;
+    padding: 10px;
+    dl {
+        margin: 0px;
+    }
+    dd {
+        margin-left: 5px;
+    }
+    dt {
+        font-weight: bold;
+    }
+}
+
+#date-choose {
+    margin: 0;
+    border-bottom: none;
+    font-size: 30px;
+    height: 64px;
+    cursor: pointer;
+    width: 13em;
+}
