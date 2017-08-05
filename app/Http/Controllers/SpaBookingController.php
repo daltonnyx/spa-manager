@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\SpaBooking;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SpaBookingController extends Controller
 {
@@ -12,11 +13,16 @@ class SpaBookingController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($request)
+    public function index($spa_id, $date)
     {
-        return SpaBooking::where([
-            ['room_id', '=',$request->room_id],
-        ])->get();
+        return DB::table('spa_bookings')
+            ->join('spa_rooms', 'spa_bookings.room_id', '=', 'spa_rooms.id')
+            ->select('spa_bookings.*')
+            ->where([
+                ['spa_rooms.shop_id', '=', $spa_id],
+                [DB::raw("DATE_FORMAT(start_on, '%Y-%c-%e')"), '=', $date]
+            ])
+            ->get();
     }
 
     /**
@@ -72,10 +78,11 @@ class SpaBookingController extends Controller
      * @param  \App\SpaBooking  $spaBooking
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, SpaBooking $spaBooking)
+    public function update(Request $request, $spaBooking)
     {
-        $spaBooking->update($request->all());
-        return response()->json($spaBooking, 200);
+        $booking = SpaBooking::find($spaBooking);
+        $booking->update($request->all());
+        return response()->json($booking, 200);
     }
 
     /**
@@ -84,9 +91,11 @@ class SpaBookingController extends Controller
      * @param  \App\SpaBooking  $spaBooking
      * @return \Illuminate\Http\Response
      */
-    public function destroy(SpaBooking $spaBooking)
+    public function destroy($spaBooking)
     {
-        $spaBooking->delete();
-        return response()->json(null, 204);
+        
+        $booking = SpaBooking::find($spaBooking);
+        $booking->delete();
+        return response()->json($spaBooking, 204);
     }
 }

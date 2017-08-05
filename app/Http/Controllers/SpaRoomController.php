@@ -68,10 +68,11 @@ class SpaRoomController extends Controller
      * @param  \App\SpaRoom  $spaRoom
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, SpaRoom $spaRoom)
+    public function update(Request $request, $spaRoom)
     {
-        $spaRoom->update($request->all());
-        return response()->json($spaRoom, 200);
+        $room = SpaRoom::find($spaRoom);
+        $room->update($request->all());
+        return response()->json($room, 200);
     }
 
     /**
@@ -80,9 +81,10 @@ class SpaRoomController extends Controller
      * @param  \App\SpaRoom  $spaRoom
      * @return \Illuminate\Http\Response
      */
-    public function destroy(SpaRoom $spaRoom)
+    public function destroy($spaRoom)
     {
-        $spaRoom->delete();
+        $room = SpaRoom::find($spaRoom);
+        $room->delete();
         return response()->json(null, 204);
     }
 }

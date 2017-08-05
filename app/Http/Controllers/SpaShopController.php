@@ -24,7 +24,7 @@ class SpaShopController extends Controller
      */
     public function create()
     {
-        //
+        return SpaShop::all();
     }
 
     /**
@@ -35,7 +35,8 @@ class SpaShopController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $shop = SpaShop::create($request->all());
+        return response()->json($shop, 201);
     }
 
     /**
@@ -46,7 +47,7 @@ class SpaShopController extends Controller
      */
     public function show(SpaShop $spaShop)
     {
-        //
+        return $spaShop;
     }
 
     /**
@@ -69,7 +70,8 @@ class SpaShopController extends Controller
      */
     public function update(Request $request, SpaShop $spaShop)
     {
-        //
+        $spaShop->update($request->all());
+        return response()->json($spaShop, 201);
     }
 
     /**
@@ -80,6 +82,7 @@ class SpaShopController extends Controller
      */
     public function destroy(SpaShop $spaShop)
     {
-        //
+        $spaShop->delete();
+        return response()->json(null, 204);
     }
 }
