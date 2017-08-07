@@ -28,9 +28,11 @@ class User extends Authenticatable
     ];
 
     public function generateToken() {
-        $this->api_token = str_random(60);
-        $this->save();
-
-        return $this->api_token;
+        $user_token = new UserToken;
+        $user_token->user_id = $this->id;
+        $user_token->date_valid = date('Y-m-d H:i', strtotime('+1 day'));
+        $user_token->api_token = str_random(60);
+        $user_token->save();
+        return $user_token->api_token;
     }
 }
