@@ -17,7 +17,7 @@ class CreateSparoomTable extends Migration
             $table->increments('id');
             $table->string("title");
             $table->integer('shop_id')->unsigned();
-            $table->foreign('shop_id')->references('id')->on('spa_shops');
+            $table->foreign('shop_id')->references('id')->on('spa_shops')->onDelete('cascade');
             $table->string('description');
         });
     }

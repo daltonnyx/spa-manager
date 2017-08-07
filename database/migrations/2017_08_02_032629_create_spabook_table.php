@@ -20,7 +20,7 @@ class CreateSpabookTable extends Migration
             $table->timestamp('start_on')->nullable();
             $table->timestamp('end_on')->nullable();
             $table->integer('room_id')->unsigned();
-            $table->foreign('room_id')->references('id')->on('spa_rooms');
+            $table->foreign('room_id')->references('id')->on('spa_rooms')->onDelete('cascade');
             $table->index('start_on','booking_start_idx');
         });
     }
