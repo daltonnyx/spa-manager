@@ -12,9 +12,12 @@ class SpaShopController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($user_id = null)
     {
-        return SpaShop::all();
+        if($user_id == null)
+            return SpaShop::all();
+        return SpaShop::where('owner',$user_id)
+               ->get();
     }
 
     /**
@@ -68,10 +71,11 @@ class SpaShopController extends Controller
      * @param  \App\SpaShop  $spaShop
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, SpaShop $spaShop)
+    public function update(Request $request, $spaShop)
     {
-        $spaShop->update($request->all());
-        return response()->json($spaShop, 201);
+        $spa = SpaShop::find($spaShop);
+        $spa->update($request->all());
+        return response()->json($spa, 201);
     }
 
     /**
