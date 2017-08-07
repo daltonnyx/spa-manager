@@ -84,8 +84,9 @@ class SpaShopController extends Controller
      * @param  \App\SpaShop  $spaShop
      * @return \Illuminate\Http\Response
      */
-    public function destroy(SpaShop $spaShop)
+    public function destroy($spaShop)
     {
+        $spaShop = SpaShop::find($spaShop);
         $spaShop->delete();
         return response()->json(null, 204);
     }
