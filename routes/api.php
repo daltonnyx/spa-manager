@@ -20,7 +20,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('/login', 'Auth\LoginController@login');
 Route::post('/logout', 'Auth\LoginController@logout');
 Route::group(['middleware' => 'auth:api'],function() {
-    Route::get('/shops', 'SpaShopController@index');
+    Route::get('/shops/{user_id?}', 'SpaShopController@index');
     Route::get('/shops/{shop}', 'SpaShopController@show');
     Route::post('/shops', 'SpaShopController@store');
     Route::put('/shops/{shop}', 'SpaShopController@update');
@@ -43,4 +43,9 @@ Route::group(['middleware' => 'auth:api'], function() {
     Route::post('/bookings', 'SpaBookingController@store');
     Route::put('/bookings/{booking}', 'SpaBookingController@update');
     Route::delete('/bookings/{booking}', 'SpaBookingController@destroy');
+});
+
+Route::group(['middleware' => 'auth:api'], function() {
+    Route::get('/users', 'UserController@index');
+    Route::post('/users', 'UserController@store');
 });
