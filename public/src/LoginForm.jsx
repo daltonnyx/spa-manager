@@ -3,7 +3,7 @@ const LoginForm = (props) => {
         <center>
           <div className="section"></div>
 
-          <h5 className="indigo-text">Xin mời bạn đăng nhập</h5>
+          <h5 className="indigo-text">Please login to continue</h5>
           <div className="section"></div>
 
           <div className="container">
@@ -18,17 +18,17 @@ const LoginForm = (props) => {
                 <div className='row'>
                   <div className='input-field col s12'>
                     <input className='validate' type='email' name='email' id='email' />
-                    <label htmlFor='email'>Email của bạn</label>
+                    <label htmlFor='email'>youremail@example.com</label>
                   </div>
                 </div>
 
                 <div className='row'>
                   <div className='input-field col s12'>
                     <input className='validate' type='password' name='password' id='password' />
-                    <label htmlFor='password'>Mật khẩu của bạn</label>
+                    <label htmlFor='password'>Your password</label>
                   </div>
                   <label style={{float: "right"}}>
-                                    <a className='pink-text' href='#!'><b>Quên mật khẩu?</b></a>
+                                    <a className='pink-text' href='#!'><b>Forgot password?</b></a>
                                 </label>
                 </div>
 

@@ -10,13 +10,19 @@ const BookingForm = (props) => {
             <input type="hidden" name="id" id="object-id" autoComplete="off" />
             <div className="input-field col s12">
               <input id="customer_name" type="text" name="customer_name" className="validate" />
-             <label htmlFor="customer_name">Tên khách hàng</label>
+             <label className="active" htmlFor="customer_name">Guest name</label>
+            </div>
+          </div>
+          <div className="row">
+            <div className="input-field col s12">
+              <input id="company" type="text" name="customer_company" className="validate" />
+             <label className="active" htmlFor="company">Company</label>
             </div>
           </div>
           <div className="row">
             <div className="input-field col s12">
               <input id="customer_phone" type="text" name="customer_phone" className="validate" />
-             <label htmlFor="customer_phone">Số điện thoại</label>
+             <label className="active" htmlFor="customer_phone">Phone number</label>
             </div>
           </div>
           <div className="row">

@@ -7,6 +7,7 @@ class App extends React.Component  {
     constructor() {
         super();
         var currentDate = new Date();
+        this.user = JSON.parse(Helper.readCookie('user'));
         this.state = {
             api_token: Helper.readCookie('spatoken'),
             formState: '',
@@ -15,7 +16,7 @@ class App extends React.Component  {
                 modalOf: "",
                 title: ""
             },
-            user: {},
+            users: [],
             rooms: [],
             spa: {},
             spas: [],
@@ -29,9 +30,12 @@ class App extends React.Component  {
         this.submitModalForm = this.submitModalForm.bind(this);
         this.updateRoom = this.updateRoom.bind(this);
         this.changeDate = this.changeDate.bind(this);
+        this.changeSpa = this.changeSpa.bind(this);
+        this.updateSpa = this.updateSpa.bind(this);
         this.login = this.login.bind(this);
         this.logout = this.logout.bind(this);
         this.deleteObject = this.deleteObject.bind(this);
+        this.openUserForm = this.openUserForm.bind(this);
     }
     componentDidMount() {
         if(this.state.api_token == null) 
@@ -40,16 +44,20 @@ class App extends React.Component  {
                 this.loadRooms(spa);
                 this.loadBookings(spa);
         } );
+        if(this.user.role == 'master')
+            this.loadUser();
         jQuery(ReactDOM.findDOMNode(this.refs.dateChoosen)).pickadate({
             format: 'dd/mm/yyyy',
             closeOnSelect: true,
         });
         jQuery(ReactDOM.findDOMNode(this.refs.dateChoosen)).on("change", this.changeDate);
+        jQuery(ReactDOM.findDOMNode(this.refs.spaChoosen)).on("change", this.changeSpa);
     }
 
     loadSpa() {
         if(this.isAuthenticated()) {
-            return Helper.getData("api/shops", this.state.api_token)
+            let uri = this.user.role == "admin" ? "api/shops/" + this.user.id : "api/shops";
+            return Helper.getData(uri, this.state.api_token)
             .then(data => new Promise((resolve,reject) => {
                     let newState = this.state;
                     newState.spa  = data[0];
@@ -62,6 +70,8 @@ class App extends React.Component  {
     }
 
     loadRooms(spa) {
+        spa = spa || this.state.spa;
+        if(spa == undefined) return;
         if(this.isAuthenticated()) {
             
             Helper.getData("api/rooms/" + spa.id, this.state.api_token)
@@ -74,9 +84,10 @@ class App extends React.Component  {
     }
 
     loadBookings(spa) {
+        spa = spa || this.state.spa;
+        if(spa == undefined) return;
         if(this.isAuthenticated()) {
             let date =  Helper.getDate(this.state.date);
-            let spa = spa || this.state.spa;
             Helper.getData("api/bookings/" + spa.id + '/' + date, this.state.api_token)
             .then(data => {
                 let newState = this.state;
@@ -87,9 +98,19 @@ class App extends React.Component  {
 
     }
 
+    loadUser() {
+        if(this.isAuthenticated()) {
+            Helper.getData("api/users",this.state.api_token)
+            .then(data => {
+                let newState = this.state;
+                newState.users = data;
+                this.setState(newState);
+            });
+        }
+    }
+
     componentDidUpdate() {
-        
-        
+        jQuery("#spa-choosen").material_select();
         Helper.updateCards();
         if(this.state.formState == 'creatingBooking' || this.state.formState == "updateBooking") {
             jQuery("#Modal #room_id").val(this.cell.room);
@@ -114,6 +135,12 @@ class App extends React.Component  {
             jQuery("#Modal #shop_id").val(this.cell.shop_id);
             jQuery("#Modal #description").val(this.cell.description);
         }
+        else if(this.state.formState == "updateSpa") {
+            jQuery("#Modal #name").val(this.cell.name);
+            jQuery("#Modal #owner").val(this.cell.owner);
+            jQuery("#Modal #address").val(this.cell.address);
+            jQuery("#Modal #object-id").val(this.cell.id);
+        }
     }
 
     isAuthenticated() {
@@ -124,17 +151,13 @@ class App extends React.Component  {
         e.preventDefault();
         var form = e.target;
         var data = Helper.getFormJSON(form);
-        var postHeaders = new Headers();
-        postHeaders.set("Content-Type", "application/json");
-        fetch("api/login", {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: postHeaders,
-        }).then(res => res.json())
+        Helper.postData("api/login",null, data)
         .then(data => {
             data = data.data;
             if(data.api_token != null) {
                 Helper.createCookie('spatoken', data.api_token, 1);
+                delete data.api_token;
+                Helper.createCookie('user', JSON.stringify(data),1);
                 window.location.reload();
             }
         });
@@ -146,6 +169,7 @@ class App extends React.Component  {
         newState.api_token = null;
         this.setState(newState);
         Helper.eraseCookie('spatoken');
+        Helper.eraseCookie('user');
         window.location.reload();
     }
 
@@ -156,10 +180,15 @@ class App extends React.Component  {
             )
         }
         return (
-            <div id="main">
+            <div id="main" className={"role-"+this.user.role}>
                 <nav className="light-blue lighten-1" role="navigation">
                     <div className="nav-wrapper container">
-                        <a id="logo-container" href="#" className="brand-logo">{this.state.spa.name}</a>
+                        <div className="brand-logo spa-choosen-container">
+                            { this.user.role != "admin" ? <select id="spa-choosen" ref="spaChoosen">
+                                {this.state.spas.map( (spa, index) => <option value={index} key={spa.id}>{spa.name}</option> )}
+                            </select> : <span>{this.state.spa.name}</span> }
+                            { !this.isGuest() ? <a href="#!" onClick={this.updateSpa} className="spa-edit"><i className="material-icons">mode_edit</i></a> : null }
+                        </div>
                         <input ref="dateChoosen" onChange={this.changeDate} className="brand-logo center" id="date-choose"  value={this.state.date.toDateString()}/>
                         <a id="logout" onClick={this.logout} href="#" className="right hide-on-med-and-down">Đăng xuất</a>
                     </div>
@@ -176,14 +205,17 @@ class App extends React.Component  {
                     submit={this.submitModalForm} 
                     modal={this.state.modal} 
                     rooms={this.state.rooms} 
-                    spas={this.state.spas}
+                    spa={this.state.spa}
+                    users={this.state.users}
                     formState={this.state.formState}
                     deleteModal={this.deleteObject}
                 />
                 <FAB 
+                    role={this.user.role}
                     createSpa={this.openSpaForm} 
                     createRoom={this.openRoomForm} 
-                    createBooking={this.openBookingForm}  
+                    createBooking={this.openBookingForm} 
+                    createUser={this.openUserForm}
                 />
             </div>
         );
@@ -198,34 +230,58 @@ class App extends React.Component  {
         this.setState(newState);
         this.loadBookings();
     }
-
+    
+    changeSpa(e) {
+        let idx = e.target.value;
+        let newState = this.state;
+        newState.spa = newState.spas[idx];
+        this.setState(newState);
+        this.loadRooms();
+        this.loadBookings();
+    }
 
     openSpaForm(e) {
+        if(this.isGuest()) return;
         this.resetFormState();
         var newState = this.state;
         newState.modal.modalOf = "spa";
         newState.formState = "creatingSpa";
-        newState.modal.title = "Tạo SPA mới";
+        newState.modal.title = "Make new spa";
+        this.setState(newState);
+        jQuery("#Modal").modal("open");
+    }
+
+    updateSpa(e) {
+        e.preventDefault();
+        if(this.isGuest()) return;
+        let newState = this.state;
+        newState.modal.modalOf = "spa";
+        newState.formState = "updateSpa";
+        newState.modal.title = "Update Spa";
+        newState.modal.role = this.user.role;
+        this.cell = newState.spa;
         this.setState(newState);
         jQuery("#Modal").modal("open");
     }
     
     openRoomForm() {
+        if(this.isGuest()) return;
         this.resetFormState();
         var newState = this.state;
         newState.modal.modalOf = "room";
         newState.formState = "creatingRoom";
-        newState.modal.title = "Tạo phòng";
+        newState.modal.title = "Create new room";
         this.setState(newState);
         jQuery("#Modal").modal("open");
     }
 
     updateRoom(e) {
+        if(this.isGuest()) return;
         this.resetFormState();
         var newState = this.state;
         newState.modal.modalOf = "room";
         newState.formState = "updateRoom";
-        newState.modal.title = "Sửa phòng";
+        newState.modal.title = "Update room";
         this.setState(newState);
         var $cell = jQuery(e.currentTarget);
         this.cell = {
@@ -238,26 +294,39 @@ class App extends React.Component  {
     }
 
     openBookingForm(e) {
+        if(this.isGuest()) return;
         this.resetFormState();
         var newState = this.state;
         newState.modal.modalOf = "booking";
         newState.formState = "creatingBooking";
-        newState.modal.title = "Đăt phòng";
+        newState.modal.title = "Book a room";
         this.setState(newState);
         this.cell = Helper.getCellData(e.target, this.state.date);
         jQuery("#Modal").modal("open");
     }
 
     updateBooking(e) {
+        if(this.isGuest()) return;
         this.resetFormState();
         var newState = this.state;
         newState.modal.modalOf = "booking";
         newState.formState = "updateBooking";
-        newState.modal.title = "Cập nhật đặt chỗ";
+        newState.modal.title = "Update booking info";
         this.setState(newState);
         var $cell = jQuery(e.currentTarget);
         var dateString = $cell.data("date").match(/(\d+)-(\d+)-(\d+)/);
         this.cell = Helper.getCellData(e.currentTarget, new Date(dateString[1],dateString[2] - 1,dateString[3])); //need -1 on month
+        jQuery("#Modal").modal("open");
+    }
+
+    openUserForm(e) {
+        if(this.isGuest()) return;
+        this.resetFormState();
+        var newState = this.state;
+        newState.modal.modalOf = "user";
+        newState.formState = "creatingUser";
+        newState.modal.title = "Create a User";
+        this.setState(newState);
         jQuery("#Modal").modal("open");
     }
 
@@ -277,11 +346,14 @@ class App extends React.Component  {
         if(this.state.formState == "creatingBooking" || this.state.formState == "updateBooking") {
             this.bookRoom(data);
         }
-        else if(this.state.formState == "creatingSpa") {
+        else if(this.state.formState == "creatingSpa" || this.state.formState == "updateSpa") {
             this.editSpa(data);
         }
         else if(this.state.formState == "creatingRoom" || this.state.formState == "updateRoom") {
             this.editRoom(data);
+        }
+        else if(this.state.formState == "creatingUser") {
+            this.editUser(data);
         }
     }
 
@@ -350,14 +422,26 @@ class App extends React.Component  {
     }
 
     editSpa(data) {
-        Helper.postData('api/shops', this.state.api_token, data)
-        .then( data => {
-            let newState = this.state;
-            newState.formState = "";
-            newState.spa = data;
-            this.setState(newState);
-            jQuery("#Modal").modal('close');
-        } );
+        if(this.state.formState == "creatingSpa") {
+            Helper.postData('api/shops', this.state.api_token, data)
+            .then( data => {
+                let newState = this.state;
+                newState.formState = "";
+                newState.spa = data;
+                this.setState(newState);
+                jQuery("#Modal").modal('close');
+            } );
+        }
+        else {
+            Helper.putData("api/shops", this.state.api_token, data)
+            .then( data => {
+                let newState = this.state;
+                newState.formState = "";
+                newState.spa = data;
+                this.setState(newState);
+                jQuery("#Modal").modal("close");
+            } )
+        }
     }
 
     editRoom(data) {
@@ -385,11 +469,22 @@ class App extends React.Component  {
         }
     }
 
+    editUser(data) {
+        Helper.postData('api/users', this.state.api_token, data)
+        .then( data => {
+            let newState = this.state;
+            newState.formState = "";
+            if(data.role != 'guest')
+                newState.users.push(data);
+            this.setState(data);
+            jQuery("#Modal").modal("close");
+        });
+    }
 
-    /* isBusy() {
-     *     return false;
-     *     return this.state.creatingSpa || this.state.creatingRoom || this.state.creatingBooking;
-     * } */
+
+    isGuest() {
+        return this.user.role == "guest";
+    }
 }
 
 

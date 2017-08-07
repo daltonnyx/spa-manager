@@ -100,9 +100,11 @@ const Helper = (function() {
         var postHeader = new Headers();
         postHeader.set("Content-Type", 'application/json');
         postHeader.set("Authorization", 'Bearer ' + token);
+        data._method = "delete";
         return fetch(uri + '/' + data.id, {
             headers: postHeader,
-            method: 'delete'
+            method: 'post',
+            body: JSON.stringify(data)
         });
     }
 
@@ -110,9 +112,10 @@ const Helper = (function() {
         var postHeader = new Headers();
         postHeader.set("Content-Type", 'application/json');
         postHeader.set("Authorization", 'Bearer ' + token);
+        data._method = "put";
         return fetch(uri + '/' + data.id, {
             headers: postHeader,
-            method: 'put',
+            method: 'post',
             body: JSON.stringify(data)
         }).then( res => res.json() );
     }
