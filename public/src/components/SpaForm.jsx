@@ -11,7 +11,7 @@ const SpaForm = (props) => {
           { props.master ? <div className="row">   
               <div className="col s12">
                   <label htmlFor="name">Owner</label>
-                  <select className="browser-default" name="owner">
+                  <select className="browser-default" name="owner" id="owner">
                       {props.users.map( user => <option key={user.id} value={user.id}>{user.name}</option> )}
                   </select>
               </div>

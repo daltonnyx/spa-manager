@@ -112,6 +112,10 @@ class App extends React.Component  {
     componentDidUpdate() {
         jQuery("#spa-choosen").material_select();
         Helper.updateCards();
+        jQuery("#Modal input, #Modal select, #Modal textarea").each(function(idx) {
+            jQuery(this).val('');
+        
+        });
         if(this.state.formState == 'creatingBooking' || this.state.formState == "updateBooking") {
             jQuery("#Modal #room_id").val(this.cell.room);
             jQuery("#Modal #start_on_hour").val(this.cell.start[1]);
@@ -247,6 +251,7 @@ class App extends React.Component  {
         newState.modal.modalOf = "spa";
         newState.formState = "creatingSpa";
         newState.modal.title = "Make new spa";
+        newState.modal.role = this.user.role;
         this.setState(newState);
         jQuery("#Modal").modal("open");
     }
@@ -404,6 +409,9 @@ class App extends React.Component  {
                 case 'updateRoom' : 
                     url = "api/rooms";
                 break;
+                case 'updateSpa' :
+                    url = "api/shops";
+                break;
                 default:
                     url = '';
                     break;
@@ -413,8 +421,13 @@ class App extends React.Component  {
                 var data = Helper.getFormJSON(form);
                 Helper.deleteData(url, this.state.api_token, data)
                     .then( response => {
-                        this.loadRooms(this.state.spa);
-                        this.loadBookings(this.state.spa);
+                        if(this.state.formState != "updateSpa") {
+                            this.loadRooms(this.state.spa);
+                            this.loadBookings(this.state.spa);
+                        }
+                        else {
+                            this.componentDidMount();
+                        }
                         jQuery("#Modal").modal("close");
                     } );
             }
