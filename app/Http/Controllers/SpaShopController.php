@@ -86,8 +86,8 @@ class SpaShopController extends Controller
      */
     public function destroy($spaShop)
     {
-        $spaShop = SpaShop::find($spaShop);
-        $spaShop->delete();
+        $spa = SpaShop::find($spaShop);
+        $spa->delete();
         return response()->json(null, 204);
     }
 }
