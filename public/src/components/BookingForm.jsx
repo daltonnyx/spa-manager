@@ -7,7 +7,7 @@ const BookingForm = (props) => {
     return (
         <form id="spa-form">
            <div className="row">
-            <input type="hidden" name="id" id="object-id" autoComplete="off" />
+            <input type="hidden" name="id" id="id" autoComplete="off" />
             <div className="input-field col s12">
               <input id="customer_name" type="text" name="customer_name" className="validate" />
              <label className="active" htmlFor="customer_name">Guest name</label>
@@ -15,14 +15,20 @@ const BookingForm = (props) => {
           </div>
           <div className="row">
             <div className="input-field col s12">
-              <input id="company" type="text" name="customer_company" className="validate" />
-             <label className="active" htmlFor="company">Company</label>
+              <input id="customer_company" type="text" name="customer_company" className="validate" />
+             <label className="active" htmlFor="customer_company">Company</label>
             </div>
           </div>
           <div className="row">
             <div className="input-field col s12">
               <input id="customer_phone" type="text" name="customer_phone" className="validate" />
              <label className="active" htmlFor="customer_phone">Phone number</label>
+            </div>
+          </div>
+          <div className="row">
+            <div className="input-field col s12">
+                <textarea name="note" className="materialize-textarea" id="note"></textarea>
+                <label className="active" htmlFor="note">Note</label>
             </div>
           </div>
           <div className="row">

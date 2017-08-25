@@ -2,7 +2,7 @@ const SpaForm = (props) => {
     return (
         <form id="spa-form">
             <div className="row">   
-                <input type="hidden" name="id" id="object-id" autoComplete="off" />
+                <input type="hidden" name="id" id="id" autoComplete="off" />
               <div className="input-field col s12">
                   <input id="name" type="text" name="name" className="validate" />
                  <label className="active" htmlFor="name">Name</label>
@@ -12,7 +12,7 @@ const SpaForm = (props) => {
               <div className="col s12">
                   <label htmlFor="name">Owner</label>
                   <select className="browser-default" name="owner" id="owner">
-                      {props.users.map( user => <option key={user.id} value={user.id}>{user.name}</option> )}
+                      {props.users.map( user => <option key={user.id} value={user.id}>{user.name + " (" + user.email + ")"}</option> )}
                   </select>
               </div>
           </div> : null }

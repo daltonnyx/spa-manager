@@ -69,21 +69,29 @@ const Helper = (function() {
     var getCellData = function(cell, date) {
         var $cell = jQuery(cell);
         var cell = {};
-        cell.room = $cell.data('room');
+        cell.room_id = $cell.data('room');
         if($cell.data("start")) {
-            cell.start = $cell.data("start").match(/(\d\d):(\d\d)/);
+            var startTime = $cell.data("start").match(/(\d\d):(\d\d)/);
+            cell.start_on_hour = startTime[1];
+            cell.start_on_minute = startTime[2];
         }
         else {
-            cell.start = $cell.data('time').match(/(\d\d):(\d\d)/);
+           var startTime = $cell.data('time').match(/(\d\d):(\d\d)/);
+            cell.start_on_hour = startTime[1];
+            cell.start_on_minute = startTime[2];
         }
         if($cell.data("end")) {
-            cell.end = $cell.data("end").match(/(\d\d):(\d\d)/);
+            var endTime = $cell.data("end").match(/(\d\d):(\d\d)/);
+            cell.end_on_hour = endTime[1];
+            cell.end_on_minute = endTime[2];
         } 
         else {
-            cell.end = ["", parseInt(cell.start[1]) + 1, cell.start[2]];
+            cell.end_on_hour = parseInt(cell.start_on_hour) + 1;
+            cell.end_on_minute = cell.start_on_minute;
         }
         
         cell.date = date;
+        cell.note = $cell.data('note');
         if($cell.data("id")) {
             cell.id = $cell.data("id");
         }
@@ -92,6 +100,9 @@ const Helper = (function() {
         }
         if($cell.data("cust-phone")) {
             cell.customer_phone = $cell.data("cust-phone");
+        }
+        if($cell.data("cust-company")) {
+            cell.customer_company = $cell.data("cust-company");
         }
         return cell;
     }

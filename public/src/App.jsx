@@ -116,35 +116,16 @@ class App extends React.Component  {
             jQuery(this).val('');
         
         });
+        if(this.cell == null)
+            return;
+        for (var prop in this.cell) {
+            jQuery("#Modal #" + prop).val(this.cell[prop]);
+        }
         if(this.state.formState == 'creatingBooking' || this.state.formState == "updateBooking") {
-            jQuery("#Modal #room_id").val(this.cell.room);
-            jQuery("#Modal #start_on_hour").val(this.cell.start[1]);
-            jQuery("#Modal #start_on_minute").val(this.cell.start[2]);
-            jQuery("#Modal #end_on_hour").val(this.cell.end[1]);
-            jQuery("#Modal #end_on_minute").val(this.cell.end[2]);
             jQuery("#Modal #date_booking").val(Helper.getFormatedDate(this.cell.date));
-            if(this.cell.customer_name) {
-                jQuery("#Modal #customer_name").val(this.cell.customer_name);
-            }
-            if(this.cell.customer_phone) {
-                jQuery("#Modal #customer_phone").val(this.cell.customer_phone);
-            }
-            if(this.cell.id) {
-                jQuery("#Modal #object-id").val(this.cell.id);
-            }
+            
         }
-        else if(this.state.formState == "updateRoom") {
-            jQuery("#Modal #title").val(this.cell.title);
-            jQuery("#Modal #object-id").val(this.cell.id);
-            jQuery("#Modal #shop_id").val(this.cell.shop_id);
-            jQuery("#Modal #description").val(this.cell.description);
-        }
-        else if(this.state.formState == "updateSpa") {
-            jQuery("#Modal #name").val(this.cell.name);
-            jQuery("#Modal #owner").val(this.cell.owner);
-            jQuery("#Modal #address").val(this.cell.address);
-            jQuery("#Modal #object-id").val(this.cell.id);
-        }
+        this.cell = null;
     }
 
     isAuthenticated() {
@@ -276,6 +257,9 @@ class App extends React.Component  {
         newState.modal.modalOf = "room";
         newState.formState = "creatingRoom";
         newState.modal.title = "Create new room";
+        this.cell = {
+            shop_id: newState.spa.id
+        }
         this.setState(newState);
         jQuery("#Modal").modal("open");
     }
@@ -295,6 +279,7 @@ class App extends React.Component  {
             description: $cell.data("desc"),
             shop_id: $cell.data("spa")
         };
+        
         jQuery("#Modal").modal("open");
     }
 
@@ -399,7 +384,7 @@ class App extends React.Component  {
     }
 
     deleteObject(e) {
-        var id = jQuery("#Modal #object-id").val();
+        var id = jQuery("#Modal #id").val();
         var url = "";
         if(id) {
             switch(this.state.formState) {
@@ -438,21 +423,13 @@ class App extends React.Component  {
         if(this.state.formState == "creatingSpa") {
             Helper.postData('api/shops', this.state.api_token, data)
             .then( data => {
-                let newState = this.state;
-                newState.formState = "";
-                newState.spa = data;
-                this.setState(newState);
-                jQuery("#Modal").modal('close');
+                window.location.reload();
             } );
         }
         else {
             Helper.putData("api/shops", this.state.api_token, data)
             .then( data => {
-                let newState = this.state;
-                newState.formState = "";
-                newState.spa = data;
-                this.setState(newState);
-                jQuery("#Modal").modal("close");
+                window.location.reload();
             } )
         }
     }

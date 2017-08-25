@@ -42,14 +42,18 @@ const TimeGrid = (props) => {
                             data-id={booking.id}
                             data-date={date}
                             data-room={booking.room_id} 
-                            data-start={start} 
+                            data-start={start}
+                            data-cust-company={booking.customer_company}
                             data-cust-name={booking.customer_name}
                             data-cust-phone={booking.customer_phone}
+                            data-note={booking.note}
                             data-end={end}>
                             <dl>
-                                <dt>Tên</dt><dd>{booking.customer_name}</dd>
-                                <dt>SDT</dt><dd>{booking.customer_phone}</dd>
+                                <dt>{booking.customer_name}</dt>
                             </dl>
+                            <div className="company">{booking.customer_company}</div>
+                            <div className="phone">{booking.customer_phone}</div>
+                            <div className="note">{booking.note}</div>
                         </div>
                     );
                 } )}
