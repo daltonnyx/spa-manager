@@ -349,15 +349,15 @@ class App extends React.Component  {
 
     bookRoom(data) {
         var timeArr = data['date_booking'].match(/(\d+)\/(\d+)\/(\d+)/);
-        var start_on = timeArr[3] + '-' + timeArr[2] + '-' + timeArr[1] + " " + data['start_on[hour]'] + ":" + data['start_on[minute]'] + ":00";
-        var end_on = timeArr[3] + '-' + timeArr[2] + '-' + timeArr[1] + ' ' + data['end_on[hour]'] + ":" + data['end_on[minute]'] + ":00";
+        var start_on = timeArr[3] + '-' + timeArr[2] + '-' + timeArr[1] + " " + data['start_on'] + ":00";
+        var end_on = timeArr[3] + '-' + timeArr[2] + '-' + timeArr[1] + ' ' + data['end_on'] + ":00";
         data['start_on'] = start_on;
         data['end_on'] = end_on;
-        delete data['date_booking'];
-        delete data['start_on[hour]'];
-        delete data['start_on[minute]'];
-        delete data['end_on[hour]'];
-        delete data['end_on[minute]'];
+        /* delete data['date_booking'];
+         * delete data['start_on[hour]'];
+         * delete data['start_on[minute]'];
+         * delete data['end_on[hour]'];
+         * delete data['end_on[minute]']; */
         if(this.state.formState == "creatingBooking") {
             Helper.postData('api/bookings', this.state.api_token, data)
             .then( data => {
@@ -376,7 +376,7 @@ class App extends React.Component  {
                     var newState = this.state;
                     newState.formState = "";
                     var oldBookingIdx = newState.bookings.findIndex( ( elm ) => elm.id == data.id );
-                    newState.bookings.splice(oldBookingIdx, 1, data);
+                    newState.bookings[oldBookingIdx] = data;
                     this.setState(newState);
                     jQuery("#Modal").modal("close");   
                 } )
@@ -477,5 +477,8 @@ class App extends React.Component  {
     }
 }
 
-
 ReactDOM.render(<App />, document.getElementById('root'));
+
+window.onresize = function() {
+    Helper.updateCards();
+};

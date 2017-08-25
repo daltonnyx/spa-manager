@@ -35,10 +35,10 @@ const Helper = (function() {
     var updateCards = function() {
         jQuery(".book").each(function (idx) {
             var $this = jQuery(this);
-            var room_id = $this.data('room');
+            var room_id = this.dataset["room"];
             var baseHeight = jQuery('.timeGrid tr.time').first().height();
-            var start_on = $this.data('start').match(/(\d\d):(\d\d)/);
-            var end_on = $this.data('end').match(/(\d\d):(\d\d)/);
+            var start_on = this.dataset['start'].match(/(\d\d):(\d\d)/);
+            var end_on = this.dataset['end'].match(/(\d\d):(\d\d)/);
             var room = jQuery('.timeGrid th.room[data-room="'+room_id+'"]');
             var time = jQuery('.timeGrid tr.time[data-time="'+start_on[0]+'"]');
             var height = (end_on[1] - start_on[1] ) * 2 + 1  + (end_on[2] - start_on[2]) / 30;
@@ -67,27 +67,26 @@ const Helper = (function() {
         }).then(res => res.json());
     }
     var getCellData = function(cell, date) {
-        var $cell = jQuery(cell);
+        var _cell = cell;
+        var $cell = jQuery(_cell);
         var cell = {};
-        cell.room_id = $cell.data('room');
+        cell.room_id = _cell.dataset['room'];
         if($cell.data("start")) {
             var startTime = $cell.data("start").match(/(\d\d):(\d\d)/);
-            cell.start_on_hour = startTime[1];
-            cell.start_on_minute = startTime[2];
+            cell.start_on = startTime[1] + ":" + startTime[2];
         }
         else {
            var startTime = $cell.data('time').match(/(\d\d):(\d\d)/);
-            cell.start_on_hour = startTime[1];
-            cell.start_on_minute = startTime[2];
+            cell.start_on = startTime[1] + ":" + startTime[2];
         }
         if($cell.data("end")) {
             var endTime = $cell.data("end").match(/(\d\d):(\d\d)/);
-            cell.end_on_hour = endTime[1];
-            cell.end_on_minute = endTime[2];
+            cell.end_on = endTime[1] + ":" + endTime[2];
         } 
         else {
-            cell.end_on_hour = parseInt(cell.start_on_hour) + 1;
-            cell.end_on_minute = cell.start_on_minute;
+            var start_on = cell.start_on.split(':');
+            var end_on_hour = parseInt(start_on[0]) + 1;
+            cell.end_on = end_on_hour + ":" + start_on[1];
         }
         
         cell.date = date;
